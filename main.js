@@ -12,12 +12,18 @@ PoW prevents possibility someone changing 1 block, then recalculating the hash f
 */
 const SHA256 = require("crypto-js/sha256");
 
+class Transaction {
+    constructor(fromAddress, toAddress, amount) {
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+    }
+}
 class Block {
-    constructor(index, timestamp, data, previousHash = '') {
-        this.index = index;
+    constructor(timestamp, transactions, previousHash = '') {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
-        this.data = data;
+        this.transactions = transactions;
         this.hash = this.calculateHash();
         this.nonce = 0;
     }
@@ -42,18 +48,53 @@ class Blockchain{
         this.chain = [this.createGenesisBlock()];
         //set blockchain difficulty (how many zeros the hash must start with(as you increase difficulty, it takes longer to run...i.e. controlling how fast blocks can be added to the blockchain))
         this.difficulty = 2;
+        this.pendingTransactions = [];
+        this.miningReward = 3;
     }
     createGenesisBlock() {
-        return new Block(0, "01/01/2018", "Genesis block", "0");
+        return new Block("01/01/2018", "Genesis block", "0");
     }
     getLatestBlock() {
         return this.chain[this.chain.length - 1];
     }
-    addBlock(newBlock) {
-        newBlock.previousHash = this.getLatestBlock().hash;
-        newBlock.mineBlock(this.difficulty);
-        this.chain.push(newBlock);
+    minePendingTransactions(miningRewardAddress) {
+        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+        block.mineBlock(this.difficulty);
+
+        console.log('Block successfully mined!');
+        //add new blocks to chain
+        this.chain.push(block);
+
+        //reset pending transactions & give miner his reward
+        this.pendingTransactions = [
+            new Transaction(null, miningRewardAddress, this.miningReward)
+        ];
     }
+
+    //add transactions into pending transactions array
+    createTransaction(transaction) {
+        this.pendingTransactions.push(transaction);
+    }
+
+    //check balance of address (not really stored in an address, just stored on blockchain)
+    getBalanceOfAddress(address) {
+        let balance = 0;
+
+        for(const block of this.chain) {
+            for(const trans of block.transactions) {
+                //sending reduces balance
+                if(trans.fromAddress === address) {
+                    balance -= trans.amount;
+                }
+                //receiving increases balance
+                if(trans.toAddress === address) {
+                    balance += trans.amount;
+                }
+            }
+        }
+        return balance;
+    }
+
     //verify integrity of blockchain:
     isChainValid() {
         for (let i = 1; i < this.chain.length; i++){
@@ -73,10 +114,36 @@ class Blockchain{
     }
 }
 
-let JSCoin = new Blockchain();
 
 //run in CMD: node main.js
 
+
+let JSCoin = new Blockchain();
+
+JSCoin.createTransaction(new Transaction('address1','address2', 1000));
+JSCoin.createTransaction(new Transaction('address2', 'address1', 400));
+
+console.log('\n Starting the miner...');
+JSCoin.minePendingTransactions('cadi-address');
+//returns mining reward balance-rewards arent added until the next block is mined
+console.log('\n Balance of Cadi is ', JSCoin.getBalanceOfAddress('cadi-address'));
+
+console.log('\n Starting the miner again...');
+JSCoin.minePendingTransactions('cadi-address');
+//returns mining reward balance-rewards arent added until the next block is mined
+console.log('\n Balance of Cadi is ', JSCoin.getBalanceOfAddress('cadi-address'));
+
+console.log('\n Starting the miner again...');
+JSCoin.minePendingTransactions('cadi-address');
+//returns mining reward balance-rewards arent added until the next block is mined
+console.log('\n Balance of Cadi is ', JSCoin.getBalanceOfAddress('cadi-address'));
+
+
+/*this code was from earlier in tutorial
+//return Blockchain
+console.log(JSON.stringify(JSCoin, null, 1));
+
+//breakdown hash per block
 console.log('Mining Block 1...')
 JSCoin.addBlock(new Block(1, "6/12/2018", { amount: 2 }));
 console.log('Mining Block 2...')
@@ -85,9 +152,6 @@ console.log('Mining Block 3...')
 JSCoin.addBlock(new Block(3, "6/12/2018", { amount: 3 }));
 console.log('Mining Block 4...')
 JSCoin.addBlock(new Block(4, "6/12/2018", { amount: 10 }));
-
-//return Blockchain
-console.log(JSON.stringify(JSCoin, null, 1));
 
 //return if blockchain is valid = TRUE
 console.log('Blockchain valid? ' + JSCoin.isChainValid());
@@ -100,6 +164,6 @@ console.log('Blockchain valid? ' + JSCoin.isChainValid());
 JSCoin.chain[2].data = { amount: 500 };
 JSCoin.chain[2].hash = JSCoin.chain[1].calculateHash();
 console.log('Blockchain valid? ' + JSCoin.isChainValid());
-
+*/
 
 
