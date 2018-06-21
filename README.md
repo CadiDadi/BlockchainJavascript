@@ -1,6 +1,6 @@
-Fundamental Proof of Work (PoW) Cryptocurrency Blockchain built in Javascript
+Fundamental SHA-256 cryptographic hash function Proof of Work (PoW) Cryptocurrency Blockchain built in Javascript
 
-SHA256 not available in Javascript by default, import library: 
+Import library: 
 npm install --save crypto-js
 
 See my Comments in main.js file
