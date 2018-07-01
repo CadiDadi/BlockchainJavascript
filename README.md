@@ -3,9 +3,9 @@ Fundamental SHA-256 cryptographic hash function Proof of Work (PoW) Cryptocurren
 Import library: 
 npm install --save crypto-js
 
-See my Comments in main.js file
+Comments in main.js file
 
-I created this by following this AWESOME Tutorial by:  Simply Explained - Savjee: Tutorial: Creating a blockchain with Javascript (Blockchain, part 1-3) - https://www.youtube.com/watch?v=zVqczFZr124&index=1&list=PLzvRQMJ9HDiTqZmbtFisdXFxul5k0F-Q4
+Built following tutorial - Creating a blockchain with Javascript (Blockchain, part 1-3) - https://www.youtube.com/watch?v=zVqczFZr124&index=1&list=PLzvRQMJ9HDiTqZmbtFisdXFxul5k0F-Q4
 
 
 
